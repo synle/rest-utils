@@ -59,3 +59,37 @@ export const getRestClient = (auth: string, configs: any = {}): MakeRestApiFunc 
     return makeRestApi(url, options, instance);
   };
 };
+
+export const getRestClientWithStickyCookies = (auth: string, configs: any = {}): MakeRestApiFunc => {
+  const instance = axios.create(configs);
+  instance.defaults.headers.common['Authorization'] = auth;
+
+  const cookiejar = [];
+
+  // pass in the cookie
+  instance.interceptors.request.use(function (config) {
+    config.headers.cookie = cookiejar.map((cookie) => `${cookie.key}=${cookie.value}`).join('; ');
+    return config;
+  });
+
+  // set the cookie
+  instance.interceptors.response.use(function (response) {
+    if (response.headers['set-cookie'] instanceof Array) {
+      response.headers['set-cookie'].forEach(function (c) {
+        const parsedCookies = Cookie.parse(c);
+        if (parsedCookies.value) {
+          cookiejar.push({
+            key: parsedCookies.key,
+            value: parsedCookies.value,
+            url: parsedCookies.domain,
+          });
+        }
+      });
+    }
+    return response;
+  });
+
+  return <T>(url: string, options: AxiosRequestConfig = {}): RestApiResponse<T> => {
+    return makeRestApi(url, options, instance);
+  };
+};
