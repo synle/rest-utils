@@ -33,18 +33,18 @@ export const makeRestApi = <T>(
   options.method = options.method || 'GET';
   options.url = url;
 
-  // TODO: remove this log line
-  const promise = axiosInstance(options);
-  promise.then(
-    (res) => console.log('  > [SUCCESS] API', options.method, url, res.status, res.statusText),
-    (res) =>
-      console.log(
-        '  > [ERROR] API',
-        options.method,
-        url,
-        res.response && res.response.status + ' ' + res.response.statusText,
-      ),
-  );
+//   // TODO: remove this log line
+//   const promise = axiosInstance(options);
+//   promise.then(
+//     (res) => console.log('  > [SUCCESS] API', options.method, url, res.status, res.statusText),
+//     (res) =>
+//       console.log(
+//         '  > [ERROR] API',
+//         options.method,
+//         url,
+//         res.response && res.response.status + ' ' + res.response.statusText,
+//       ),
+//   );
 
   return { promise, abort };
 };
