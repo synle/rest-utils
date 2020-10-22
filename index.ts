@@ -1,18 +1,29 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosStatic, AxiosInstance } from 'axios';
-import tough from 'tough-cookie';
-
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosInstance,
+  AxiosError,
+} from "axios";
 const CancelToken = axios.CancelToken;
-
-const Cookie = tough.Cookie;
 
 export interface RestApiResponse<T> {
   promise: Promise<AxiosResponse<T>>;
-  abort: Function;
+  abort: (message: string) => void;
 }
 
-export interface RestClient {
-  makeRestApi: Function;
+export interface RestApiConfig extends AxiosRequestConfig {
+  shouldCacheApi?: boolean;
 }
+
+/**
+ * interval in which cache will be cleaned
+ */
+const CACHE_CLEANUP_INTERVAL = 15 * 60000; // 15 mins
+
+/**
+ * this is an in memory cache used for the frontend
+ */
+const apiCache: Record<string, RestApiResponse<unknown>> = {};
 
 /**
  * This will make the API calls, and also return an object that we can tap
@@ -20,42 +31,58 @@ export interface RestClient {
  */
 export const makeRestApi = <T>(
   url: string,
-  options: AxiosRequestConfig = {},
-  axiosInstance: AxiosInstance | AxiosStatic = axios,
+  options: RestApiConfig = {},
+  axiosIntance: AxiosInstance = axios
 ): RestApiResponse<T> => {
   // append the cancelation token
   const source = CancelToken.source();
-  const abort = (abortMsg: string) => {
-    source.cancel(abortMsg);
-  };
-
+  const abort = (abortMsg: string): void => source.cancel(abortMsg);
   options.cancelToken = source.token;
-  options.method = options.method || 'GET';
+  options.method = options.method || "get";
   options.url = url;
+  options.shouldCacheApi = !!options.shouldCacheApi;
 
-  // TODO: remove this log line
-  const promise = axiosInstance(options);
-  promise.then(
-    (res) => console.log('  > [SUCCESS] API', options.method, url, res.status, res.statusText),
-    (res) =>
-      console.log(
-        '  > [ERROR] API',
-        options.method,
-        url,
-        res.response && res.response.status + ' ' + res.response.statusText,
-      ),
-  );
+  if (
+    options.shouldCacheApi === true &&
+    options.method.toLowerCase() === "get"
+  ) {
+    // only cache for GET call
+    const cachedKey = `${url}.${JSON.stringify(options)}`;
+    if (!apiCache[cachedKey]) {
+      apiCache[cachedKey] = {
+        promise: axiosIntance.request<T>(options),
+        abort,
+      };
 
-  return { promise, abort };
+      // set up timer to clean up cache after delay
+      setTimeout(() => {
+        delete apiCache[cachedKey];
+      }, CACHE_CLEANUP_INTERVAL);
+    }
+    return apiCache[cachedKey] as RestApiResponse<T>;
+  }
+
+  return { promise: axiosIntance.request<T>(options), abort };
 };
 
-export type MakeRestApiFunc = <T>(url: string, options: AxiosRequestConfig) => RestApiResponse<T>;
+/**
+ * register interceptor callback for success callback
+ *
+ * @param interceptorCallback
+ */
+export const registerResponseSuccessInterceptor = (
+  interceptorCallback: (resp: AxiosResponse<any>) => Promise<any> | any
+) => {
+  axios.interceptors.response.use(interceptorCallback);
+};
 
-export const getRestClient = (auth: string, configs: any = {}): MakeRestApiFunc => {
-  const instance = axios.create(configs);
-  instance.defaults.headers.common['Authorization'] = auth;
-
-  return <T>(url: string, options: AxiosRequestConfig = {}): RestApiResponse<T> => {
-    return makeRestApi(url, options, instance);
-  };
+/**
+ * register interceptor callback for error callback
+ *
+ * @param interceptorCallback
+ */
+export const registerResponseErrorInterceptor = (
+  interceptorCallback: (resp: AxiosError<any>) => Promise<any> | any
+) => {
+  axios.interceptors.response.use(undefined, interceptorCallback);
 };
