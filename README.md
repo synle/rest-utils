@@ -9,43 +9,21 @@ make this a librrary
 
 ### Define the API
 
-#### YammerAuthApi.ts
+#### UserApi.ts
 ```
-import { makeRestApi, getRestClient, RestApiResponse, MakeRestApiFunc } from 'synle/rest-utils';
+import { makeRestApi, RestApiResponse } from 'synle/RestUtils';
 
-// ... define YAMMER_CONFIGS somewhere
+export interface UserProfileResponse {
+  id: string;
+  email: string;
+  mobilePhone: string;
+  givenName: string;
+  displayName: string;
+}
 
-export class YammerAuthApi {
-  static getAccessToken(code: string): RestApiResponse<YammerUserProfileResponse> {
-    const url = `${BASE_YAMMER_FEED_URL}/oauth2/access_token`;
-
-    return makeRestApi(url, {
-      method: 'POST',
-      data: {
-        client_id: YAMMER_CONFIGS.APP_ID,
-        client_secret: YAMMER_CONFIGS.APP_SECRET,
-        code,
-        grant_type: 'authorization_code',
-      },
-    });
+export default class UserApi {
+  static getUserProfile(): RestApiResponse<UserProfileResponse> {
+    return makeRestApi('/api/me');
   }
 }
-```
-
-#### index.ts
-```
-import {YammerAuthApi} from './YammerAuthApi';
-
-
-// one-liner
-async function getAccessToken(code){
-   (await YammerAuthApi.getAccessToken(code).promise).data
-}
-
-// or set up the promise for abort
-const api = YammerAuthApi.getAccessToken(code);
-api.promise.then(res => console.log(res.data));
-
-// to abort it
-api.abort();
 ```
