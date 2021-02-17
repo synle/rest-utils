@@ -11,6 +11,11 @@ export interface RestApiConfig extends AxiosRequestConfig {
 }
 
 /**
+ * interval in which cache will be cleaned
+ */
+const CACHE_CLEANUP_INTERVAL = 15 * 60000; // 15 mins
+
+/**
  * this is an in memory cache used for the frontend
  */
 const apiCache: Record<string, RestApiResponse<unknown>> = {};
@@ -38,10 +43,15 @@ export const makeRestApi = <T>(
     // only cache for GET call
     const cachedKey = `${url}.${JSON.stringify(options)}`;
     if (!apiCache[cachedKey]) {
-      apiCache[cachedKey] = { promise: axios(options), abort };
+      apiCache[cachedKey] = { promise: axios.request<T>(options), abort };
+
+      // set up timer to clean up cache after delay
+      setTimeout(() => {
+        delete apiCache[cachedKey];
+      }, CACHE_CLEANUP_INTERVAL);
     }
     return apiCache[cachedKey] as RestApiResponse<T>;
   }
 
-  return { promise: axios(options), abort };
+  return { promise: axios.request<T>(options), abort };
 };
