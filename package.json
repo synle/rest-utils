@@ -1,0 +1,33 @@
+{
+  "name": "rest-utils",
+  "version": "1.0.0",
+  "description": "A wrapper for axios with easy access to cancel network calls and support for react",
+  "main": "dist/index.js",
+  "scripts": {
+    "format": "sh format.sh",
+    "build": "sh build.sh",
+    "test": "sh test.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/synle/rest-utils.git"
+  },
+  "keywords": [
+    "node",
+    "axios",
+    "rest"
+  ],
+  "author": "Sy Le",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/synle/rest-utils/issues"
+  },
+  "homepage": "https://github.com/synle/rest-utils#readme",
+  "devDependencies": {
+    "@types/node": "^16.7.10",
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.2"
+  }
+}

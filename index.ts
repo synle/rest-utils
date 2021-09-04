@@ -1,4 +1,9 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosInstance,
+  AxiosError,
+} from "axios";
 const CancelToken = axios.CancelToken;
 
 export interface RestApiResponse<T> {
@@ -27,23 +32,27 @@ const apiCache: Record<string, RestApiResponse<unknown>> = {};
 export const makeRestApi = <T>(
   url: string,
   options: RestApiConfig = {},
+  axiosIntance: AxiosInstance = axios
 ): RestApiResponse<T> => {
   // append the cancelation token
   const source = CancelToken.source();
   const abort = (abortMsg: string): void => source.cancel(abortMsg);
   options.cancelToken = source.token;
-  options.method = options.method || 'get';
+  options.method = options.method || "get";
   options.url = url;
   options.shouldCacheApi = !!options.shouldCacheApi;
 
   if (
     options.shouldCacheApi === true &&
-    options.method.toLowerCase() === 'get'
+    options.method.toLowerCase() === "get"
   ) {
     // only cache for GET call
     const cachedKey = `${url}.${JSON.stringify(options)}`;
     if (!apiCache[cachedKey]) {
-      apiCache[cachedKey] = { promise: axios.request<T>(options), abort };
+      apiCache[cachedKey] = {
+        promise: axiosIntance.request<T>(options),
+        abort,
+      };
 
       // set up timer to clean up cache after delay
       setTimeout(() => {
@@ -53,5 +62,27 @@ export const makeRestApi = <T>(
     return apiCache[cachedKey] as RestApiResponse<T>;
   }
 
-  return { promise: axios.request<T>(options), abort };
+  return { promise: axiosIntance.request<T>(options), abort };
+};
+
+/**
+ * register interceptor callback for success callback
+ *
+ * @param interceptorCallback
+ */
+export const registerResponseSuccessInterceptor = (
+  interceptorCallback: (resp: AxiosResponse<any>) => Promise<any> | any
+) => {
+  axios.interceptors.response.use(interceptorCallback);
+};
+
+/**
+ * register interceptor callback for error callback
+ *
+ * @param interceptorCallback
+ */
+export const registerResponseErrorInterceptor = (
+  interceptorCallback: (resp: AxiosError<any>) => Promise<any> | any
+) => {
+  axios.interceptors.response.use(undefined, interceptorCallback);
 };
