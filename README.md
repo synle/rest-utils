@@ -5,7 +5,7 @@ Sample rest utils library based on Axios.js works on both frontend and backend, 
 ## How to use
 
 ```
-npm i --save synle/rest-utils
+npm i --save synle-rest-utils
 npm i --saveDev typescript @types/node
 ```
 
@@ -16,7 +16,7 @@ npm i --saveDev typescript @types/node
 Note that here I make it static, but you can instantiate and use it normally like other classes.
 
 ```
-import { makeRestApi, RestApiResponse } from 'rest-utils';
+import { makeRestApi, RestApiResponse } from 'synle-rest-utils';
 
 export interface UserAgentResponse {
   "user-agent": string

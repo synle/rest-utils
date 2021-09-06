@@ -5,3 +5,4 @@ build.sh
 .github
 .gitignore
 publishBetaTags.js
+node_modules

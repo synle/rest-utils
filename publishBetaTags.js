@@ -11,4 +11,3 @@ const newTempVersion = `${major}.${minor}.${patch}-${Date.now()}`;
 oldPackageJson.version = newTempVersion;
 fs.writeFileSync('./package.json', JSON.stringify(oldPackageJson, null, 2));
 console.log('New Beta Tags:', newTempVersion);
-© 2021 GitHub, Inc.

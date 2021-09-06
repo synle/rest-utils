@@ -1,6 +1,6 @@
 {
-  "name": "rest-utils",
-  "version": "1.0.0",
+  "name": "synle-rest-utils",
+  "version": "1.1.0",
   "description": "A wrapper for axios with easy access to cancel network calls and support for react",
   "main": "dist/index.js",
   "scripts": {

@@ -20,7 +20,7 @@ echo '''
 ''' > package.json
 
 echo """
-import { makeRestApi, RestApiResponse } from 'rest-utils';
+import { makeRestApi, RestApiResponse } from 'synle-rest-utils';
 
 interface UserAgentResponse {
   'user-agent': string
@@ -50,7 +50,7 @@ class UserApi {
 })();
 """ > index.ts
 
-npm i --save synle/rest-utils
+npm i --save synle-rest-utils
 npm i --saveDev typescript @types/node
 npm start
 
