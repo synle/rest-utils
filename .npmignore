@@ -6,3 +6,7 @@ build.sh
 .gitignore
 publishBetaTags.js
 node_modules
+jest.config.js
+jest.setup.js
+__tests__
+coverage
