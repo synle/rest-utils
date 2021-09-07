@@ -8,7 +8,7 @@ on:
     branches: [master, main]
 
 jobs:
-  build:
+  build_test_publish:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,3 +30,26 @@ jobs:
     - run: npm publish --tag beta
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  verify_new_package:
+    needs: [build_test_publish]
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x] # 14 is LTS
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: synle/rest-utils-back-end-example
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm install synle-rest-utils@beta
+      - run: npm test
+
