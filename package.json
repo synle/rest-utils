@@ -6,7 +6,9 @@
   "scripts": {
     "format": "sh format.sh",
     "build": "sh build.sh",
-    "test": "sh test.sh"
+    "test": "jest --ci",
+    "test:dev": "jest --ci --watch --verbose",
+    "test:resetSnapshot": "jest --ci --updateSnapshot"
   },
   "repository": {
     "type": "git",
@@ -24,7 +26,12 @@
   },
   "homepage": "https://github.com/synle/rest-utils#readme",
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/node": "^16.7.10",
+    "@types/qs": "^6.9.7",
+    "jest": "^27.1.0",
+    "qs": "^6.10.1",
+    "ts-jest": "^27.0.5",
     "typescript": "^4.4.2"
   },
   "dependencies": {

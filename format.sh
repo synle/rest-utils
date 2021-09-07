@@ -1,1 +1,1 @@
-npx prettier --write *.ts *.md *.json *.js
+npx prettier --write **/**/**/**/*.{ts,tsx,js,jsx,scss} *.{ts,md,js,json}
