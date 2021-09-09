@@ -1,9 +1,4 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosInstance,
-  AxiosError,
-} from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosError } from 'axios';
 const CancelToken = axios.CancelToken;
 
 export interface RestApiResponse<T> {
@@ -32,20 +27,17 @@ const apiCache: Record<string, RestApiResponse<unknown>> = {};
 export const makeRestApi = <T>(
   url: string,
   options: RestApiConfig = {},
-  axiosIntance: AxiosInstance = axios
+  axiosIntance: AxiosInstance = axios,
 ): RestApiResponse<T> => {
   // append the cancelation token
   const source = CancelToken.source();
   const abort = (abortMsg: string): void => source.cancel(abortMsg);
   options.cancelToken = source.token;
-  options.method = options.method || "get";
+  options.method = options.method || 'get';
   options.url = url;
   options.shouldCacheApi = !!options.shouldCacheApi;
 
-  if (
-    options.shouldCacheApi === true &&
-    options.method.toLowerCase() === "get"
-  ) {
+  if (options.shouldCacheApi === true && options.method.toLowerCase() === 'get') {
     // only cache for GET call
     const cachedKey = `${url}.${JSON.stringify(options)}`;
     if (!apiCache[cachedKey]) {
@@ -71,7 +63,7 @@ export const makeRestApi = <T>(
  * @param interceptorCallback
  */
 export const registerResponseSuccessInterceptor = (
-  interceptorCallback: (resp: AxiosResponse<any>) => Promise<any> | any
+  interceptorCallback: (resp: AxiosResponse<any>) => Promise<any> | any,
 ) => {
   axios.interceptors.response.use(interceptorCallback);
 };
@@ -82,7 +74,7 @@ export const registerResponseSuccessInterceptor = (
  * @param interceptorCallback
  */
 export const registerResponseErrorInterceptor = (
-  interceptorCallback: (resp: AxiosError<any>) => Promise<any> | any
+  interceptorCallback: (resp: AxiosError<any>) => Promise<any> | any,
 ) => {
   axios.interceptors.response.use(undefined, interceptorCallback);
 };

@@ -1,5 +1,5 @@
-import qs from "qs";
-import { makeRestApi, RestApiResponse } from "synle-rest-utils";
+import qs from 'qs';
+import { makeRestApi, RestApiResponse } from 'synle-rest-utils';
 
 interface BasicApiResponse {
   args: Record<string | number, string | number>;
@@ -23,16 +23,14 @@ export class BasicApi {
 
   static doPost(data: any): RestApiResponse<BasicApiResponse> {
     return makeRestApi(`https://httpbin.org/post`, {
-      method: "POST",
+      method: 'POST',
       data: data,
     });
   }
 
-  static doAuthenticatedCall(
-    userPasswordHash: string
-  ): RestApiResponse<AuthenticatedResponse> {
+  static doAuthenticatedCall(userPasswordHash: string): RestApiResponse<AuthenticatedResponse> {
     return makeRestApi(`https://httpbin.org/basic-auth/aaa/bbb`, {
-      method: "GET",
+      method: 'GET',
       headers: {
         authorization: `Basic ${userPasswordHash}`,
       },

@@ -1,11 +1,11 @@
-import { makeRestApi, RestApiResponse } from "synle-rest-utils";
+import { makeRestApi, RestApiResponse } from 'synle-rest-utils';
 
 interface UserAgentResponse {
-  "user-agent": string;
+  'user-agent': string;
 }
 
 export class UserAgentApi {
   static getUserAgent(): RestApiResponse<UserAgentResponse> {
-    return makeRestApi("https://httpbin.org/user-agent");
+    return makeRestApi('https://httpbin.org/user-agent');
   }
 }
